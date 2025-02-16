@@ -1,0 +1,5 @@
+{
+    "admin": [ "DT", "SF", "NP", "RM", "EC", "EMF" ],
+    "user1": [ "DT", "SF" ],
+    "user2": [ "NP", "RM" ]
+}
