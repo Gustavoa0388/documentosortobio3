@@ -24,7 +24,7 @@ namespace DocumentosOrtobio
         {
             { "Documentos Vigentes", new List<string> { "DT", "EC", "EMF", "GR", "NP", "RM", "RMP", "SF" } },
             { "Documentos Obsoletos", new List<string> { "DT", "EC", "EMF", "GR", "NP", "RM", "RMP", "SF" } },
-            { "Validações", new List < string > { "Validações" } }
+            { "Validações", new List<string> { "Validações" } }
         };
 
         public Form1(User user)
@@ -280,7 +280,7 @@ namespace DocumentosOrtobio
 
         private void BtnSettings_Click(object sender, EventArgs e)
         {
-            SettingsForm settingsForm = new SettingsForm();
+            SettingsForm settingsForm = new SettingsForm(loggedUser.Username);
             settingsForm.ShowDialog();
             LogActivity("Abriu o painel de configurações.");
         }
@@ -303,8 +303,11 @@ namespace DocumentosOrtobio
             // Verificar e remover usuários com status false
             CheckAndRemoveLoggedOutUsers();
 
+            // Registrar a saída do usuário
+            LogActivity("Logout");
+
             // Fechar o aplicativo completamente
-            Application.Exit();
+            //Application.Exit();
         }
 
         private void CheckAndRemoveLoggedOutUsers()
