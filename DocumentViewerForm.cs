@@ -36,7 +36,7 @@ namespace DocumentosOrtobio
 
             btnSettings.Visible = loggedUser.Role == "admin";
             ConfigurePdfViewerPermissions();
-            PopulateCategoryComboBox(comboBoxCategory);
+            PopulateCategoryComboBox(comboBoxCategory3);
             LoadUserPreferences();
         }
 
@@ -49,12 +49,12 @@ namespace DocumentosOrtobio
         private void ConfigurePdfViewerPermissions()
         {
             // Habilitar as opções de zoom para todos os usuários
-            pdfViewer.ShowToolbar = true;
+            pdfViewer3.ShowToolbar = true;
 
             // Desabilitar as funções de impressão e salvamento para usuários comuns
             if (loggedUser.Role != "admin")
             {
-                var toolStrip = pdfViewer.Controls.OfType<ToolStrip>().FirstOrDefault();
+                var toolStrip = pdfViewer3.Controls.OfType<ToolStrip>().FirstOrDefault();
                 if (toolStrip != null)
                 {
                     foreach (ToolStripItem item in toolStrip.Items)
@@ -86,7 +86,7 @@ namespace DocumentosOrtobio
 
         private void ComboBoxCategory_SelectedIndexChanged(object sender, EventArgs e)
         {
-            PopulateSubCategoryComboBox(comboBoxSubCategory, comboBoxCategory.SelectedItem.ToString());
+            PopulateSubCategoryComboBox(comboBoxSubCategory3, comboBoxCategory3.SelectedItem.ToString());
         }
 
         private void PopulateSubCategoryComboBox(ComboBox comboBox, string selectedCategory)
@@ -108,13 +108,13 @@ namespace DocumentosOrtobio
             comboBox.SelectedIndex = 0;
         }
 
-        private void ButtonSearch_Click(object sender, EventArgs e)
+        private void ButtonSearch3_Click(object sender, EventArgs e)
         {
-            LogActivity("Buscou na Categoria");
-            string searchPattern = textBoxSearch.Text;
-            string selectedCategory = comboBoxCategory.SelectedItem.ToString();
-            string selectedSubCategory = comboBoxSubCategory.SelectedItem.ToString();
-            listBoxFiles.Items.Clear();
+            LogActivity("Buscou na Categoria 3");
+            string searchPattern = textBoxSearch3.Text;
+            string selectedCategory = comboBoxCategory3.SelectedItem.ToString();
+            string selectedSubCategory = comboBoxSubCategory3.SelectedItem.ToString();
+            listBoxFiles3.Items.Clear();
 
             if (selectedCategory == "All Categories")
             {
@@ -122,13 +122,13 @@ namespace DocumentosOrtobio
                 {
                     if (UserCanAccessCategory(category))
                     {
-                        SearchFiles(category, selectedSubCategory, searchPattern, listBoxFiles);
+                        SearchFiles(category, selectedSubCategory, searchPattern, listBoxFiles3);
                     }
                 }
             }
             else
             {
-                SearchFiles(selectedCategory, selectedSubCategory, searchPattern, listBoxFiles);
+                SearchFiles(selectedCategory, selectedSubCategory, searchPattern, listBoxFiles3);
             }
         }
 
@@ -165,14 +165,14 @@ namespace DocumentosOrtobio
             }
         }
 
-        private void ListBoxFiles_SelectedIndexChanged(object sender, EventArgs e)
+        private void ListBoxFiles3_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (listBoxFiles.SelectedItem != null)
+            if (listBoxFiles3.SelectedItem != null)
             {
-                string selectedFileName = listBoxFiles.SelectedItem.ToString();
+                string selectedFileName = listBoxFiles3.SelectedItem.ToString();
                 currentFilePath = GetFilePath(selectedFileName);
                 DisplayPdf(currentFilePath);
-                LogActivity($"Visualizou o arquivo {selectedFileName}");
+                LogActivity($"Visualizou o arquivo {selectedFileName} na Categoria 3");
             }
         }
 
@@ -204,7 +204,7 @@ namespace DocumentosOrtobio
             if (filePath != null)
             {
                 var pdfDocument = PdfDocument.Load(filePath);
-                pdfViewer.Document = pdfDocument;
+                pdfViewer3.Document = pdfDocument;
             }
         }
 
@@ -244,7 +244,7 @@ namespace DocumentosOrtobio
             CheckAndRemoveLoggedOutUsers();
 
             // Registrar a saída do usuário
-           // LogActivity("Logout");
+            //LogActivity("Logout");
 
             // Fechar o aplicativo completamente
             Application.Exit();
@@ -288,8 +288,16 @@ namespace DocumentosOrtobio
 
         private void LogActivity(string activity)
         {
-            string logMessage = $"{DateTime.Now:dd-MM-yyyy HH:mm:ss} - {GetLocalIPAddress()} - {loggedUser.Username} - {activity}{Environment.NewLine}";
-            File.AppendAllText("activity_log.txt", logMessage);
+            try
+            {
+                string logFilePath = Path.Combine(basePath, "activity_log.txt");
+                string logMessage = $"{DateTime.Now:dd-MM-yyyy HH:mm:ss} - {GetLocalIPAddress()} - {loggedUser.Username} - {activity}{Environment.NewLine}";
+                File.AppendAllText(logFilePath, logMessage);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao registrar atividade: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private string GetLocalIPAddress()
@@ -406,7 +414,7 @@ namespace DocumentosOrtobio
         private void BtnVisualizacaoDupla_Click(object sender, EventArgs e)
         {
             SaveUserPreferencesForDualView();
-            Form1 form1 = new Form1(loggedUser);
+            Viewer1 form1 = new Viewer1(loggedUser);
             form1.Show();
             this.Hide();
         }
@@ -426,6 +434,5 @@ namespace DocumentosOrtobio
 
             File.WriteAllText(userPreferencesFilePath, JsonConvert.SerializeObject(userPreferences, Formatting.Indented));
         }
-
     }
 }

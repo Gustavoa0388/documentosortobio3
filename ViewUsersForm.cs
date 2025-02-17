@@ -10,15 +10,22 @@ namespace DocumentosOrtobio
     public partial class ViewUsersForm : Form
     {
         private readonly string basePath = @"\\D4MDP574\Doc Viewer\Banco de dados";
-        private readonly Dictionary<string, List<string>> categoriesWithSubmenus = new Dictionary<string, List<string>>
-        {
-            { "Documentos Vigentes", new List<string> { "DT", "EC", "EMF", "GR", "NP", "RM", "RMP", "SF" } },
-            { "Documentos Obsoletos", new List<string> { "DT", "EC", "EMF", "GR", "NP", "RM", "RMP", "SF" } },
-            { "Validações", new List < string > { "Validações" } }
-        };
+        private readonly string loggedInUser;
 
-        public ViewUsersForm()
+        public ViewUsersForm(string loggedInUser)
         {
+            this.loggedInUser = loggedInUser;
+
+            // Inicialize o CategoryManager com as categorias e subcategorias
+            var initialCategoriesWithSubmenus = new Dictionary<string, List<string>>
+            {
+                { "Documentos Vigentes", new List<string> { "DT", "EC", "EMF", "GR", "NP", "RM", "RMP", "SF" } },
+                { "Documentos Obsoletos", new List<string> { "DT", "EC", "EMF", "GR", "NP", "RM", "RMP", "SF" } },
+                { "Validações", new List<string> { "Validações" } }
+            };
+
+            CategoryManager.Initialize(initialCategoriesWithSubmenus);
+
             InitializeComponent();
             LoadUsers();
         }
@@ -56,6 +63,7 @@ namespace DocumentosOrtobio
         private void PopulateCheckedListBox()
         {
             checkedListBoxCategories.Items.Clear();
+            var categoriesWithSubmenus = CategoryManager.GetCategoriesWithSubmenus();
             foreach (var category in categoriesWithSubmenus.Keys)
             {
                 checkedListBoxCategories.Items.Add(category);
@@ -99,6 +107,8 @@ namespace DocumentosOrtobio
             File.WriteAllText(usersFilePath, JsonConvert.SerializeObject(users, Formatting.Indented));
             File.WriteAllText(userPermissionsFilePath, JsonConvert.SerializeObject(userPermissions, Formatting.Indented));
 
+            ActivityLogger.Log(loggedInUser, $"Atualizou o usuário: {selectedUsername}");
+
             MessageBox.Show("Usuário atualizado com sucesso!");
         }
 
@@ -119,6 +129,8 @@ namespace DocumentosOrtobio
                 File.WriteAllText(userPermissionsFilePath, JsonConvert.SerializeObject(userPermissions, Formatting.Indented));
 
                 LoadUsers();
+
+                ActivityLogger.Log(loggedInUser, $"Excluiu o usuário: {selectedUsername}");
 
                 MessageBox.Show("Usuário excluído com sucesso!");
             }
